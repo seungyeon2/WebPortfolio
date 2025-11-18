@@ -135,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const grid = document.getElementById('projectGrid');
   if(grid){
     projects.forEach(p => {
+      if (p.title === 'SSG Note') return; // temporarily hide this card
       const el = document.createElement('article');
       el.className = 'project-card rounded-2xl border hover:shadow-sm transition flex flex-col overflow-hidden';
       // Ensure images reference the moved assets/ folder
