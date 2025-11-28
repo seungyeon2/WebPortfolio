@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
       head.textContent = g.title;
       ksaWrap.appendChild(head);
       g.items.forEach(x=>{
-        const matches = (ksaFilter === 'all') || (Array.isArray(x.cats) && x.cats.includes(ksaFilter));
+        const matches = (ksaFilter==='all') || (Array.isArray(x.cats) && x.cats.includes(ksaFilter));
         if(matches){
           const span = document.createElement('span');
           span.className = 'chip';
@@ -129,36 +129,80 @@ document.addEventListener('DOMContentLoaded', () => {
       impact:'프로토타입 제작 및 사용자 리서치 진행',
       image:'홍삼.png',
       url:'https://leeseungyeon.super.site/others/%ed%94%84%eb%a1%9c%eb%aa%a8%ec%85%98-%ea%b8%b0%ed%9a%8d-%ed%99%8d%ec%82%bc-%eb%b9%a8%ea%b0%9c%ec%a1%8c%ec%82%bc'
+    },
+    {
+      title:'빔틈',
+      tags:['plan','data','mkt','ai'],
+      image:'빔틈.png',
+      url:'https://flat-pantry-778.notion.site/29aeaa61c1b680aabc69f6efb711bac2?pvs=74',
+      role:'기획 100% | 개발 100%',
+      period:'2025.11',
+      tools:'Excel, Python, HTML, CSS, JavaScript',
+      problem:'F&B폐업률 문제해결을 위한 데이터 기반 입지선정 솔루션 필요',
+      action:'데이터기반 상권 분석, 예상매출 시뮬레이션 개발',
+      impact:'출점 리스크를 최소화하는 정량적 지표 개발 및 솔루션 제안'
     }
   ];
 
   const grid = document.getElementById('projectGrid');
-  if(grid){
+  let projectFilter = 'all';
+  function makeProjectCard(p){
+    const el = document.createElement('article');
+    el.className = 'project-card rounded-2xl border hover:shadow-sm transition flex flex-col overflow-hidden';
+    // Ensure images reference the moved assets/ folder
+    const imgSrc = (p.image && !/^https?:\/\//i.test(p.image))
+      ? (p.image.startsWith('assets/') ? p.image : `assets/${p.image}`)
+      : p.image;
+    const imgHtml = p.image ? `<img src="${imgSrc}" alt="${p.title}" loading="lazy" class="w-full h-44 object-cover"/>` : '';
+    const rolePeriodHtml = (p.role || p.period)
+      ? `<div class="mt-1 text-xs text-gray-500">역할 ${p.role || ''}${(p.role && p.period) ? ' · ' : ''}${p.period || ''}</div>`
+      : '';
+    const toolsHtml = p.tools ? `<div class="mt-2 text-xs text-gray-500">도구 ${p.tools}</div>` : '';
+    const detailsHtml = (p.problem || p.action || p.impact)
+      ? `<div class="mt-4 text-sm">
+          ${p.problem ? `<div><span class=\"font-medium\">Problem</span> — ${p.problem}</div>` : ''}
+          ${p.action ? `<div class=\"mt-1\"><span class=\"font-medium\">Action</span> — ${p.action}</div>` : ''}
+          ${p.impact ? `<div class=\"mt-1\"><span class=\"font-medium\">Impact</span> — ${p.impact}</div>` : ''}
+        </div>`
+      : '';
+    el.innerHTML = `
+      <a href="${p.url || '#'}" target="_blank" rel="noopener" class="block focus:outline-none">
+      ${imgHtml}
+      <div class="p-5">
+        <div class="flex flex-wrap gap-1 mb-2">${(p.tags || []).map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
+        <h3 class="font-semibold text-lg">${p.title}</h3>
+        ${rolePeriodHtml}
+        ${toolsHtml}
+        ${detailsHtml}
+      </div>
+      </a>`;
+    return el;
+  }
+  function renderProjects(){
+    if(!grid) return;
+    grid.innerHTML = '';
     projects.forEach(p => {
-      if (p.title === 'SSG Note') return; // temporarily hide this card
-      const el = document.createElement('article');
-      el.className = 'project-card rounded-2xl border hover:shadow-sm transition flex flex-col overflow-hidden';
-      // Ensure images reference the moved assets/ folder
-      const imgSrc = (p.image && !/^https?:\/\//i.test(p.image))
-        ? (p.image.startsWith('assets/') ? p.image : `assets/${p.image}`)
-        : p.image;
-      const imgHtml = p.image ? `<img src="${imgSrc}" alt="${p.title}" loading="lazy" class="w-full h-44 object-cover"/>` : '';
-      el.innerHTML = `
-        <a href="${p.url || '#'}" target="_blank" rel="noopener" class="block focus:outline-none">
-        ${imgHtml}
-        <div class="p-5">
-          <div class="flex flex-wrap gap-1 mb-2">${p.tags.map(t=>`<span class='tag'>${t}</span>`).join('')}</div>
-          <h3 class="font-semibold text-lg">${p.title}</h3>
-          <div class="mt-1 text-xs text-gray-500">역할 ${p.role} · ${p.period}</div>
-          <div class="mt-2 text-xs text-gray-500">도구 ${p.tools}</div>
-          <div class="mt-4 text-sm">
-            <div><span class="font-medium">Problem</span> — ${p.problem}</div>
-            <div class="mt-1"><span class="font-medium">Action</span> — ${p.action}</div>
-            <div class="mt-1"><span class="font-medium">Impact</span> — ${p.impact}</div>
-          </div>
-        </div>
-        </a>`;
-      grid.appendChild(el);
+      const matches = (projectFilter === 'all') || ((p.tags || []).includes(projectFilter));
+      if(matches){ grid.appendChild(makeProjectCard(p)); }
+    });
+  }
+  renderProjects();
+  // Tag filter buttons (Projects toolbar)
+  const projFilterBtns = document.querySelectorAll('#projects .kbd');
+  if(projFilterBtns && projFilterBtns.length){
+    projFilterBtns.forEach(btn => {
+      btn.style.cursor = 'pointer';
+      btn.setAttribute('role','button');
+      btn.setAttribute('tabindex','0');
+      btn.addEventListener('click', () => {
+        const tag = btn.textContent.trim();
+        projectFilter = (projectFilter === tag) ? 'all' : tag; // toggle off to show all
+        projFilterBtns.forEach(b => b.setAttribute('aria-pressed', (b === btn && projectFilter !== 'all') ? 'true' : 'false'));
+        renderProjects();
+      });
+      btn.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); btn.click(); }
+      });
     });
   }
 
