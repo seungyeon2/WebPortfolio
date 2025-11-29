@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
       problem:'F&B폐업률 문제해결을 위한 데이터 기반 입지선정 솔루션 필요',
       action:'데이터기반 상권 분석, 예상매출 시뮬레이션 개발',
       impact:'출점 리스크를 최소화하는 정량적 지표 개발 및 솔루션 제안'
-    }
+    },
     {
       title:'Sttock · 생활용품 재고관리',
       tags:['plan','data','ux'],
@@ -141,8 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
       impact:'프로토타입 제작 및 사용자 리서치 진행',
       image:'홍삼.png',
       url:'https://leeseungyeon.super.site/others/%ed%94%84%eb%a1%9c%eb%aa%a8%ec%85%98-%ea%b8%b0%ed%9a%8d-%ed%99%8d%ec%82%bc-%eb%b9%a8%ea%b0%9c%ec%a1%8c%ec%82%bc'
-    },
-    
+    }
   ];
 
   const grid = document.getElementById('projectGrid');
